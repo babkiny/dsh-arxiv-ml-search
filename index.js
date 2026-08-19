@@ -65,6 +65,30 @@ const DETAIL_PAPER_SCHEMA = {
 }
 
 /**
+ * Describe one search call for the trajectory UI.
+ *
+ * Without this the harness labels the card from whichever argument the model
+ * happened to emit first, so a call shows up as "arxiv_search · abstract" and
+ * the reader cannot tell what was searched.
+ *
+ * @param {object} args - the call's arguments.
+ * @returns {object} a generic call view.
+ */
+function presentSearchCall(args) {
+  const parts = []
+  if (args?.query) parts.push(String(args.query))
+  // The synonym set reads as an alternation, but only alongside a query.
+  if (args?.any_of?.length) parts.push((parts.length ? 'or ' : '') + args.any_of.join(' / '))
+  const scope = args?.field && args.field !== 'all' ? ' in ' + args.field : ''
+  return {
+    card: 'generic',
+    kind: 'search',
+    title: 'arXiv: ' + (parts.join(' ') || 'filtered search') + scope,
+    rawInput: args,
+  }
+}
+
+/**
  * Register the arXiv tools and the companion skill.
  * @param {import('@deepseek-ai/cordis').Context} ctx - cordis context.
  * @param {object} [config] - plugin config from cordis.patch.yml.
@@ -106,9 +130,25 @@ export function apply(ctx, config = {}) {
     parameters: {
       query: {
         type: 'string',
-        required: true,
-        description: 'Search terms. Plain text is matched as a phrase; raw arXiv syntax '
-          + '(ti:, abs:, au:, cat:, AND/OR/ANDNOT, parentheses) is passed through unchanged.',
+        description: 'Topic terms, NOT a question. "RLHF calibration" finds papers; '
+          + '"does RLHF hurt calibration" finds none. An exact phrase is tried first, then '
+          + 'looser word matching if that finds nothing. Raw arXiv syntax (ti:, abs:, au:, '
+          + 'cat:, AND/OR/ANDNOT, parentheses) is passed through unchanged. Optional only '
+          + 'if you give any_of, authors, categories or a date range instead.',
+      },
+      any_of: {
+        type: 'array',
+        items: { type: 'string' },
+        description: 'Alternative phrasings of the SAME concept, ORed together in one request, '
+          + 'e.g. ["chain of thought", "step-by-step reasoning", "scratchpad"]. Use this instead '
+          + 'of running the same search three times: papers name one idea many ways.',
+      },
+      match: {
+        type: 'string',
+        enum: ['auto', 'phrase', 'terms', 'keywords'],
+        description: 'How to match `query`. Default auto: exact phrase, then all content words, '
+          + 'then topical words only, stopping at the first that finds anything. Pin one to '
+          + 'disable the fallback — phrase is exact, keywords is broadest.',
       },
       field: {
         type: 'string',
@@ -154,11 +194,14 @@ export function apply(ctx, config = {}) {
           offset: { type: 'number' },
           returned: { type: 'number' },
           query: { type: 'string' },
+          strategy: { type: 'string' },
+          relaxed: { type: 'boolean' },
           papers: { type: 'array', items: SEARCH_PAPER_SCHEMA },
         },
       },
       render: (_args, value) => [{ type: 'text', text: renderSearch(value) }],
     },
+    presentCall: presentSearchCall,
     async execute(args) {
       const categories = args.categories?.length
         ? args.categories
@@ -208,6 +251,12 @@ export function apply(ctx, config = {}) {
       },
       render: (_args, value) => [{ type: 'text', text: renderDetails(value) }],
     },
+    presentCall: (args) => ({
+      card: 'generic',
+      kind: 'read',
+      title: 'arXiv: ' + (args?.ids ?? []).join(', '),
+      rawInput: args,
+    }),
     async execute(args) {
       return getPapers(args, transport)
     },

@@ -81,6 +81,67 @@ test('an empty feed produces an empty, well-formed payload', async () => {
   assert.match(renderSearch(result), /No arXiv papers matched/)
 })
 
+/**
+ * A fetch stand-in that answers each successive call from a list of feeds.
+ * @param {string[]} bodies - response bodies, in call order.
+ * @returns {{ (url: string): Promise<object>, calls: string[] }} fake fetch.
+ */
+function fakeSequence(bodies) {
+  const calls = []
+  const impl = async (url) => {
+    const body = bodies[Math.min(calls.length, bodies.length - 1)]
+    calls.push(url)
+    return { ok: true, status: 200, text: async () => body }
+  }
+  impl.calls = calls
+  return impl
+}
+
+test('an exact phrase that matches costs exactly one request', async () => {
+  const fetchImpl = fakeSequence([feed('search')])
+  const result = await search({ query: 'chain of thought' }, fast(fetchImpl))
+  assert.equal(fetchImpl.calls.length, 1)
+  assert.equal(result.strategy, 'phrase')
+  assert.equal(result.relaxed, false)
+})
+
+test('an empty phrase falls back to word matching and says so', async () => {
+  const fetchImpl = fakeSequence([feed('empty'), feed('search')])
+  const result = await search({ query: 'does RLHF hurt calibration' }, fast(fetchImpl))
+  assert.equal(fetchImpl.calls.length, 2, 'phrase missed, terms answered')
+  assert.equal(result.strategy, 'terms')
+  assert.equal(result.relaxed, true)
+  assert.equal(result.query, '(all:RLHF AND all:hurt AND all:calibration)')
+  assert.equal(result.returned, 5)
+  // The rendering has to carry the caveat, not just the payload.
+  assert.match(renderSearch(result), /Exact phrase found nothing; matched on terms/)
+})
+
+test('the ladder walks to the broadest rung before giving up', async () => {
+  const fetchImpl = fakeSequence([feed('empty')])
+  const result = await search({ query: 'does RLHF hurt calibration' }, fast(fetchImpl))
+  assert.equal(fetchImpl.calls.length, 3)
+  assert.equal(result.strategy, 'keywords', 'reports the attempt whose emptiness means most')
+  assert.equal(result.total, 0)
+  assert.match(renderSearch(result), /down to loose word matching/)
+})
+
+test('pinning match spends one request and never relaxes', async () => {
+  const fetchImpl = fakeSequence([feed('empty')])
+  const result = await search({ query: 'does RLHF hurt calibration', match: 'phrase' }, fast(fetchImpl))
+  assert.equal(fetchImpl.calls.length, 1)
+  assert.equal(result.strategy, 'phrase')
+  assert.equal(result.relaxed, false)
+})
+
+test('any_of reaches the request as an OR group', async () => {
+  const fetchImpl = fakeSequence([feed('search')])
+  const result = await search({ any_of: ['chain of thought', 'scratchpad'] }, fast(fetchImpl))
+  assert.equal(result.query, '(all:"chain of thought" OR all:scratchpad)')
+  // URLSearchParams encodes spaces as '+', which decodeURIComponent leaves alone.
+  assert.match(decodeURIComponent(fetchImpl.calls[0]), /OR\+all:scratchpad/)
+})
+
 test('getPapers returns full abstracts and reports missing ids', async () => {
   const fetchImpl = fakeFetch(feed('idlist'))
   const result = await getPapers({ ids: ['1706.03762', '1412.6980', '9999.99999'] }, fast(fetchImpl))
@@ -154,6 +215,28 @@ test('a 5xx response is retried, a 4xx is not', async () => {
     /check the query syntax/,
   )
   assert.equal(badAttempts, 1, 'a bad query must not be retried')
+})
+
+test('concurrent callers queue instead of bursting', async () => {
+  // The agent fires several searches at once and each may walk a ladder, so the
+  // limiter has to space callers that never see each other's timestamps.
+  const sentAt = []
+  const fetchImpl = async () => {
+    sentAt.push(Date.now())
+    return { ok: true, status: 200, text: async () => feed('empty') }
+  }
+  resetThrottle()
+  const options = { fetchImpl, minIntervalMs: 60 }
+  await Promise.all([
+    fetchFeed('https://example.invalid/1', options),
+    fetchFeed('https://example.invalid/2', options),
+    fetchFeed('https://example.invalid/3', options),
+  ])
+  assert.equal(sentAt.length, 3)
+  for (let i = 1; i < sentAt.length; i++) {
+    const gap = sentAt[i] - sentAt[i - 1]
+    assert.ok(gap >= 50, 'request ' + (i + 1) + ' left only ' + gap + 'ms after the previous one')
+  }
 })
 
 test('the User-Agent identifies the plugin and any contact', () => {

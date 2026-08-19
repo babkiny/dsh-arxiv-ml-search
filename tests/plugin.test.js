@@ -92,10 +92,29 @@ test('defineTool compiles the shorthand into a parameter schema', () => {
   plugin.apply(ctx, {})
   const search = tools.get('arxiv_search')
   assert.equal(search.parameters.type, 'object')
-  assert.deepEqual(search.parameters.required, ['query'])
+  // `query` is optional: any_of, authors, categories or a date range alone are
+  // valid searches, and lib/query.js explains itself when nothing is given.
+  assert.equal(search.parameters.required, undefined)
   assert.deepEqual(search.parameters.properties.field.enum, ['all', 'title', 'abstract'])
-  assert.equal(search.parameters.properties.authors.type, 'array')
+  assert.deepEqual(search.parameters.properties.match.enum, ['auto', 'phrase', 'terms', 'keywords'])
+  assert.equal(search.parameters.properties.any_of.type, 'array')
   assert.deepEqual(tools.get('arxiv_get').parameters.required, ['ids'])
+})
+
+test('calls carry a label that names what was searched', () => {
+  const { ctx, tools } = fakeContext()
+  plugin.apply(ctx, {})
+  const search = tools.get('arxiv_search')
+  // Without this the UI labels the card from whichever argument came first,
+  // showing "arxiv_search · abstract" instead of the actual query.
+  assert.equal(search.presentCall({ field: 'abstract', query: 'reward shaping' }).title,
+    'arXiv: reward shaping in abstract')
+  assert.equal(search.presentCall({ any_of: ['PBRS', 'potential-based shaping'] }).title,
+    'arXiv: PBRS / potential-based shaping')
+  assert.equal(search.presentCall({ query: 'accuracy', any_of: ['scratchpad'] }).title,
+    'arXiv: accuracy or scratchpad')
+  assert.equal(search.presentCall({ categories: ['cs.LG'] }).kind, 'search')
+  assert.equal(tools.get('arxiv_get').presentCall({ ids: ['1706.03762'] }).title, 'arXiv: 1706.03762')
 })
 
 test('config overrides reach the tool descriptions', () => {

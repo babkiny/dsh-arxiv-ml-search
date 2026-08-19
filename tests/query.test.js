@@ -6,7 +6,14 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { buildIdUrl, buildSearchQuery, buildSearchUrl, normaliseId } from '../lib/query.js'
+import {
+  buildIdUrl,
+  buildSearchQuery,
+  buildSearchUrl,
+  normaliseId,
+  planStrategies,
+  significantWords,
+} from '../lib/query.js'
 
 /**
  * Read back the decoded search_query of a built URL.
@@ -81,6 +88,65 @@ test('sort names map onto the API values', () => {
 test('the built URL round-trips through URL decoding', () => {
   assert.equal(queryOf(buildSearchUrl({ query: 'chain of thought', categories: ['cs.LG'] })),
     'all:"chain of thought" AND (cat:cs.LG)')
+})
+
+test('the terms strategy drops function words only', () => {
+  assert.deepEqual(significantWords('does RLHF hurt calibration', 'terms'), ['RLHF', 'hurt', 'calibration'])
+  // ML-meaningful nouns must survive both strategies.
+  assert.deepEqual(significantWords('scaling of model training data', 'keywords'), ['scaling', 'model', 'training', 'data'])
+})
+
+test('the keywords strategy also drops research meta-words', () => {
+  assert.deepEqual(significantWords('papers that show RLHF hurts calibration', 'keywords'), ['RLHF', 'calibration'])
+})
+
+test('a query of nothing but dropped words still searches for something', () => {
+  assert.deepEqual(significantWords('what are the latest papers', 'keywords'), ['what', 'are', 'the', 'latest', 'papers'])
+})
+
+test('strategies shape the expression from exact to forgiving', () => {
+  const args = { query: 'does RLHF hurt calibration' }
+  assert.equal(buildSearchQuery(args, 'phrase'), 'all:"does RLHF hurt calibration"')
+  assert.equal(buildSearchQuery(args, 'terms'), '(all:RLHF AND all:hurt AND all:calibration)')
+  assert.equal(buildSearchQuery(args, 'keywords'), '(all:RLHF AND all:calibration)')
+})
+
+test('the auto ladder runs precise to forgiving without duplicates', () => {
+  const plan = planStrategies({ query: 'does RLHF hurt calibration' })
+  assert.deepEqual(plan.map((rung) => rung.strategy), ['phrase', 'terms', 'keywords'])
+  // A single word is the same expression under every strategy, so it is tried once.
+  assert.deepEqual(planStrategies({ query: 'grokking' }).map((r) => r.strategy), ['phrase'])
+  assert.equal(planStrategies({ query: 'grokking' })[0].query, 'all:grokking')
+})
+
+test('raw arXiv syntax is never relaxed', () => {
+  const plan = planStrategies({ query: 'abs:"reward hacking" ANDNOT cat:cs.CV' })
+  assert.equal(plan.length, 1, 'a hand-written expression has nothing to relax')
+})
+
+test('pinning match disables the fallback', () => {
+  const plan = planStrategies({ query: 'does RLHF hurt calibration', match: 'phrase' })
+  assert.deepEqual(plan.map((r) => r.strategy), ['phrase'])
+  assert.throws(() => planStrategies({ query: 'x', match: 'fuzzy' }), /match must be auto/)
+})
+
+test('any_of ORs the phrasings of one concept', () => {
+  assert.equal(
+    buildSearchQuery({ any_of: ['chain of thought', 'scratchpad'] }),
+    '(all:"chain of thought" OR all:scratchpad)',
+  )
+  assert.equal(
+    buildSearchQuery({ query: 'accuracy', any_of: ['chain of thought', 'scratchpad'] }),
+    'all:accuracy AND (all:"chain of thought" OR all:scratchpad)',
+  )
+})
+
+test('any_of alone is enough to make a search valid', () => {
+  assert.doesNotThrow(() => buildSearchQuery({ any_of: ['grokking'] }))
+})
+
+test('any_of respects the field option', () => {
+  assert.equal(buildSearchQuery({ any_of: ['grokking'], field: 'title' }), '(ti:grokking)')
 })
 
 test('ids are normalised from URLs and prefixes', () => {
