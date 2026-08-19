@@ -72,18 +72,37 @@ Verified working on dsh `0.1.0-rc.8`, in both the headless and web profiles.
 
 ## Install
 
-Works the same for any profile — swap `headless` for `web` and back:
+Two lines: add the package to the profile you use, then start it. Nothing to
+download by hand and no build step.
+
+    dsh plugin --profile web add dsh-arxiv-ml-search
+
+Without a global dsh install, the same through npx:
+
+    npx @deepseek-ai/dsh dsh plugin --profile web add dsh-arxiv-ml-search
+    npx @deepseek-ai/dsh web
+
+Ask a question and the tools are simply there — no flags, no mention of the
+plugin:
+
+> Do any papers show RLHF hurting calibration? Cite ids.
+
+Any other profile works the same way; swap `web` for `headless` and it answers
+one task on the command line and exits:
 
     dsh plugin --profile headless add dsh-arxiv-ml-search
-
-That is a thin wrapper over pnpm, so it also takes a directory, a tarball, or a
-git URL instead of a package name:
-
-    dsh plugin --profile headless add ./dsh-arxiv-ml-search-0.1.0.tgz
-
-Then run it — no extra flags, the tools are simply there:
-
     dsh --profile headless "Do any papers show RLHF hurting calibration? Cite ids."
+
+### Installing an unpublished build
+
+Only needed when you are working on the plugin itself. `dsh plugin add` is a
+thin wrapper over pnpm, so it takes a directory, a tarball or a git URL wherever
+a package name would go:
+
+    dsh plugin --profile web add ../dsh-arxiv-ml-search          # a working copy
+    dsh plugin --profile web add ./dsh-arxiv-ml-search-0.1.0.tgz  # a local pack
+
+Installing from the registry needs none of this.
 
 ### If the plugin does not show up
 
@@ -102,7 +121,7 @@ after installing and add the entry by hand if it is missing:
 
 Confirm what actually composes, without booting anything:
 
-    dsh --profile headless --dump-config
+    dsh --profile web --dump-config
 
 ## Develop
 
