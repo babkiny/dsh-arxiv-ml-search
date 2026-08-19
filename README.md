@@ -14,23 +14,55 @@ Two tools plus a skill that tells the model how to use them:
   and never assert anything the returned text does not say.
 
 No Python and no build step. The arXiv API is a plain HTTP GET returning Atom
-XML, so `lib/atom.js` parses exactly the fields we use and the only dependency
-is the harness's own `@deepseek-ai/dsh-tools`.
+XML, so `lib/atom.js` parses exactly the fields we use, and the only thing the
+plugin needs from the harness is `@deepseek-ai/dsh-tools`.
 
-That one is a regular dependency, not a peer: dsh writes
-`autoInstallPeers: false` into every profile's `pnpm-workspace.yaml`, so a peer
-dependency would never be installed and the plugin would fail to import.
+**That must stay a peer dependency, never a regular one.** dsh writes
+`autoInstallPeers: false` into every profile's `pnpm-workspace.yaml` on purpose:
+the harness owns `dsh-tools`, and a plugin that declares it under
+`dependencies` makes pnpm install a *second copy* into the profile.
+`TOOL_RUNTIME_SCHEDULER` inside that package is a module-local `Symbol()`, so
+two copies mean two different symbols, and the whole tool registry breaks — not
+just this plugin's tools. The symptom is every tool call in the session, built-in
+ones included, failing with:
 
-Verified against dsh `0.1.0-rc.7`.
+    Cannot read properties of undefined (reading 'prepare')
+
+Verified working on dsh `0.1.0-rc.8`, in both the headless and web profiles.
 
 ## Install
 
-    dsh plugin --profile web add <path to this directory>
+Works the same for any profile — swap `headless` for `web` and back:
 
-Then list the package in that profile's `dsh.profile.bundles`
-(`~/.dsh/profiles/<name>/package.json`). Installing alone is not enough — the
-loader composes its tree from `bundles`, not from `dependencies`, so a plugin
-that is only installed stays inert.
+    dsh plugin --profile headless add dsh-arxiv-ml-search
+
+That is a thin wrapper over pnpm, so it also takes a directory, a tarball, or a
+git URL instead of a package name:
+
+    dsh plugin --profile headless add ./dsh-arxiv-ml-search-0.1.0.tgz
+
+Then run it — no extra flags, the tools are simply there:
+
+    dsh --profile headless "Do any papers show RLHF hurting calibration? Cite ids."
+
+### If the plugin does not show up
+
+Loading needs the package listed in `dsh.profile.bundles`
+(`~/.dsh/profiles/<name>/package.json`), not just in `dependencies`. Normally
+`dsh plugin add` appends it for you: after pnpm succeeds it walks the
+dependencies and adds every package that declares `dsh.bundle`.
+
+The catch is that the reconcile step only runs when pnpm exits **zero**. An
+unrelated blocked build script elsewhere in the profile — `ERR_PNPM_IGNORED_BUILDS`
+is the usual one — aborts the command first, so the package installs but never
+joins the layer stack and the plugin stays silently inert. Check the manifest
+after installing and add the entry by hand if it is missing:
+
+    "dsh": { "profile": { "bundles": [ "...", "dsh-arxiv-ml-search" ] } }
+
+Confirm what actually composes, without booting anything:
+
+    dsh --profile headless --dump-config
 
 ## Develop
 
@@ -55,9 +87,12 @@ Two things bite here:
   the ESM loader fail with `ERR_UNSUPPORTED_ESM_URL_SCHEME` (`Received protocol
   'c:'`), because it reads the drive letter as a URL scheme.
 
-Check the plugin composes into the tree before booting anything:
+Check the overlay composes into the tree before booting anything:
 
-    dsh --profile web --patch ./dev.cordis.yml --dump-config
+    dsh --profile headless --patch ./dev.cordis.yml --dump-config
+
+Use the overlay for iterating on the source; use a real install (above) for
+anything you actually want to keep.
 
 ## Layout
 
