@@ -8,7 +8,8 @@
     "index.js",
     "lib",
     "skills",
-    "cordis.patch.yml"
+    "cordis.patch.yml",
+    "LICENSE"
   ],
   "dsh": {
     "bundle": {
