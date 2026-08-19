@@ -13,6 +13,46 @@ Two tools plus a skill that tells the model how to use them:
   orthogonal queries, read the shortlist properly, report a verdict with ids,
   and never assert anything the returned text does not say.
 
+## What the skill actually changes
+
+The two tools are always in the toolset, so the model *can* reach arXiv without
+the skill. What the skill adds is knowing how to search — and that turns out to
+be most of the value. Measured on one prompt, run twice in the same workspace,
+once with the skill loaded and once without:
+
+| | skill not loaded | skill loaded |
+| --- | --- | --- |
+| synonym sets (`any_of`) | 0 | 11 distinct, across 36 calls |
+| category narrowing (`ml_only`) | 9 | 36 |
+| relaxed matches reported to the user | — | 4 |
+
+Without it the model still searches, just blindly: one phrasing per concept, no
+narrowing, and no obligation to say when a match was approximate rather than
+exact. With it, the answer names which abstracts were actually read and flags
+where the evidence is thin.
+
+### It loads without being asked for papers
+
+The skill is meant to fire on any ML question, not only on "find me papers".
+Ask a plain engineering question —
+
+> My RL agent gets a set of state features but the reward never makes it rely
+> on some of them. How do I increase a specific feature's influence?
+
+— and the model loads the skill and answers from real work: potential-based
+reward shaping, curiosity, auxiliary tasks, each with an arXiv id it fetched
+rather than recalled.
+
+Getting that to happen took a specific fix. The skill catalog the model reads
+carries **name and description only** — `whenToUse` never reaches it, and the
+description is truncated past 500 characters — so that one string is the entire
+routing signal. An earlier one-liner about "searching arXiv for papers" got
+skipped on advice-shaped questions, with the model reasoning "no skill needed,
+it's a general question", and then using the tools without any of the rules
+above. The description now claims those questions explicitly. Routing is still
+a model judgement rather than a guarantee: if the skill gets skipped, the
+description is the thing to edit.
+
 No Python and no build step. The arXiv API is a plain HTTP GET returning Atom
 XML, so `lib/atom.js` parses exactly the fields we use, and the only thing the
 plugin needs from the harness is `@deepseek-ai/dsh-tools`.
