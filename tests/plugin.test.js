@@ -57,6 +57,18 @@ test('apply registers both tools and the skill', () => {
   assert.ok(skills[0].content.includes('arxiv_search'), 'SKILL.md should be shipped and read')
 })
 
+test('the catalog description covers questions that never mention papers', () => {
+  const { ctx, skills } = fakeContext()
+  plugin.apply(ctx, {})
+  const { description } = skills[0]
+  // The catalog shows name and description only, truncated at 500 characters,
+  // so this string is the entire routing signal. A description that only talks
+  // about "finding papers" gets skipped on questions phrased as plain advice.
+  assert.ok(description.length <= 500, 'longer than 500 chars would be truncated in the catalog')
+  assert.ok(/conceptual and how-to/.test(description), 'must claim the advice-shaped questions')
+  assert.ok(/never mention papers/.test(description), 'must say it applies without an explicit ask')
+})
+
 test('the tools survive defineTool validation with usable schemas', () => {
   const { ctx, tools } = fakeContext()
   plugin.apply(ctx, {})

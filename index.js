@@ -21,7 +21,23 @@ export const inject = ['tools']
 
 const SKILL_FILE = fileURLToPath(new URL('./skills/dsh-arxiv-ml-search/SKILL.md', import.meta.url))
 
-const DESCRIPTION = 'Search arXiv for ML/DL/RL papers and check claims against real abstracts.'
+/**
+ * Routing text for the skill catalog — the only signal the model uses to decide
+ * whether to load this skill, so it has to name the cases it covers. An earlier
+ * one-liner about "searching for papers" got skipped on questions phrased as
+ * plain advice: the model reasoned "no skill needed, it's a general question",
+ * then used the tools without the query and honesty rules the skill teaches.
+ * The catalog shows name and description only (whenToUse never reaches it) and
+ * truncates past 500 characters.
+ */
+const DESCRIPTION = [
+  'Ground any machine-learning answer in the arXiv record instead of model memory.',
+  'Use it whenever a question touches ML, DL or RL — how to do something, whether a',
+  'method works or fails, what is new on a topic, or any answer that would name a',
+  'paper, method or result. This includes plain conceptual and how-to questions that',
+  'never mention papers, arXiv or search: load it before answering, not only when',
+  'the user explicitly asks for literature.',
+].join(' ')
 
 /** Shape of one paper in the search output. */
 const SEARCH_PAPER_SCHEMA = {
