@@ -87,6 +87,15 @@ test('decodeXml handles named and numeric entities', () => {
   assert.equal(decodeXml('&unknown; stays'), '&unknown; stays')
 })
 
+test('an out-of-range character reference is left alone, not thrown on', () => {
+  // fromCodePoint throws past 0x10FFFF, which would fail the whole tool call.
+  assert.equal(decodeXml('&#1114112;'), '&#1114112;')
+  assert.equal(decodeXml('&#x110000;'), '&#x110000;')
+  assert.equal(decodeXml('&#0;'), '&#0;')
+  // The last valid code point still decodes.
+  assert.equal(decodeXml('&#x10FFFF;'), String.fromCodePoint(0x10ffff))
+})
+
 test('rejects a body that is not a feed', () => {
   assert.throws(() => parseFeed('<html>503 Service Unavailable</html>'), /not an Atom feed/)
 })

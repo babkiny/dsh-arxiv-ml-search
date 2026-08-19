@@ -149,6 +149,17 @@ test('any_of respects the field option', () => {
   assert.equal(buildSearchQuery({ any_of: ['grokking'], field: 'title' }), '(ti:grokking)')
 })
 
+test('inherited property names never resolve as options', () => {
+  // The tool schema's enum blocks these, but the builders are exported and a
+  // bare table index would hand back Object.prototype members.
+  assert.equal(buildSearchQuery({ query: 'grokking', field: '__proto__' }), 'all:grokking')
+  assert.equal(buildSearchQuery({ query: 'grokking', field: 'constructor' }), 'all:grokking')
+  const sortOf = (sort) => new URL(buildSearchUrl({ query: 'x', sort })).searchParams.get('sortBy')
+  assert.equal(sortOf('__proto__'), 'relevance')
+  assert.equal(sortOf('constructor'), 'relevance')
+  assert.equal(sortOf('toString'), 'relevance')
+})
+
 test('ids are normalised from URLs and prefixes', () => {
   assert.equal(normaliseId('https://arxiv.org/abs/1706.03762v7'), '1706.03762v7')
   assert.equal(normaliseId('https://arxiv.org/pdf/1706.03762.pdf'), '1706.03762')
