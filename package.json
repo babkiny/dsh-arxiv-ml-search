@@ -46,5 +46,8 @@
     "type": "git",
     "url": "git+https://github.com/babkiny/dsh-arxiv-ml-search.git"
   },
-  "homepage": "https://github.com/babkiny/dsh-arxiv-ml-search"
+  "homepage": "https://github.com/babkiny/dsh-arxiv-ml-search",
+  "bugs": {
+    "url": "https://github.com/babkiny/dsh-arxiv-ml-search/issues"
+  }
 }
