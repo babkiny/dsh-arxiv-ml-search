@@ -47,6 +47,6 @@
   },
   "homepage": "https://github.com/babkiny/dsh-arxiv-ml-search",
   "dependencies": {
-    "@deepseek-ai/dsh-tools": "^0.1.0-rc.7"
+    "@deepseek-ai/dsh-tools": "^0.1.0-rc.8"
   }
 }
