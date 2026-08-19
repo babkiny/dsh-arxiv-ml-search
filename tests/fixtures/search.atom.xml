@@ -1,0 +1,149 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/dlcO+gYfnj0oAgzHL7vgXyIhEKE</id>
+  <title>arXiv Query: search_query=(cat:cs.LG OR cat:cs.AI) AND abs:"chain of thought"&amp;id_list=&amp;start=0&amp;max_results=5</title>
+  <updated>2026-08-19T13:55:25Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=(cat:cs.LG+OR+cat:cs.AI)+AND+abs:%22chain+of+thought%22&amp;start=0&amp;max_results=5&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>5</opensearch:itemsPerPage>
+  <opensearch:totalResults>3572</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2608.17981v1</id>
+    <title>Recirculation</title>
+    <updated>2026-08-18T16:30:21Z</updated>
+    <link href="https://arxiv.org/abs/2608.17981v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.17981v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We describe an inference-time architectural enhancement for off-the-shelf foundation models that markedly reduces perplexity and boosts accuracy across generation and reasoning tasks. Our approach incurs essentially no additional latency during generation, though it requires serial processing in the prefill phase. Motivated by the fundamental limitation that state updates in feedforward transformers are bounded by model depth, our technique, recirculation, introduces a specific form of recurrence that allows the model to act as a dynamical system and track belief states. We distinguish this technique from chain-of-thought computation---which is better reserved for complex inferences rather than basic state tracking---as well as from popular depth-recurrence techniques (looping) and the costly training of recurrent transformers. We also propose and evaluate an adaptive variant of recirculation which requires only light tuning of hyperparameters while freezing the original model weights. Relative to the off-the-shelf baseline, adaptive recirculation achieves remarkable gains on the Gemma3 family, including a 23% reduction in perplexity on a suite of datasets, a 21% increase in accuracy on GSM8k, and reliable improvements in accuracy on other downstream tasks. Our training-free approach succeeds by leveraging the model itself to inform architectural modifications, suggesting a route to architectural evolution guided by a trained network's properties rather than forced, arbitrary design choices.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-18T16:30:21Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Michael C. Mozer</name>
+    </author>
+    <author>
+      <name>Shoaib Ahmed Siddiqui</name>
+    </author>
+    <author>
+      <name>Danny Sawyer</name>
+    </author>
+    <author>
+      <name>Sunny Sanyal</name>
+    </author>
+    <author>
+      <name>Rosanne Liu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2608.17301v1</id>
+    <title>SignalReasoner: Assessing the Upper Bound of 3B Models for Signal Mathematical Reasoning</title>
+    <updated>2026-08-18T02:52:41Z</updated>
+    <link href="https://arxiv.org/abs/2608.17301v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.17301v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Post-training with supervised chain-of-thought fine-tuning and reinforcement learning from verifiable rewards has substantially improved the mathematical reasoning capabilities of large language models (LLMs). However, their application to signal processing problems remains relatively under-explored. This report investigates reinforcement fine-tuning strategies for adapting Qwen2.5-3B-Base to graduate-level signal mathematical problems from WirelessMATHBench-XL, a comprehensive benchmark for mathematical reasoning in this domain. We examine two training paradigms: (i) direct reinforcement learning (RL) on WirelessMATHBench-XL with verifiable rewards; and (ii) supervised fine-tuning (SFT) on a distilled wireless-domain chain-of-thought corpus, followed by the same domain-specific RL stage. Across both paradigms, we benchmark Group Relative Policy Optimization (GRPO), Group Sequence Policy Optimization (GSPO), and Geometric-Mean Policy Optimization (GMPO). We aim to assess whether domain-aware CoT SFT serves as an effective initialization for subsequent RL, and whether GSPO or GMPO offer advantages in stability or accuracy over GRPO for signal reasoning tasks. Our best model achieves an overall accuracy of 39.12\%, representing a more than threefold improvement over the untrained Base model (12.37\%).</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-18T02:52:41Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Guozheng Sun</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2608.16747v1</id>
+    <title>Would this change your answer? Evaluating Explanations of LLM Behavior In The Wild with Counterfactual Experiments</title>
+    <updated>2026-08-17T15:57:06Z</updated>
+    <link href="https://arxiv.org/abs/2608.16747v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.16747v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Many areas of AI research, such as language model interpretability and chain of thought faithfulness, seek to explain model behaviors. But what constitutes a "good" explanation? In this work, we evaluate explanations through the lens of counterfactual simulatability-whether the explanation is useful for predicting model behaviors on related counterfactual inputs. To this end, we introduce CHIVE (Counterfactual Hypothesis Investigation Via Edits), a novel agentic pipeline that identifies unexpected model behaviors in the wild and investigates them with counterfactual prompt edits. This yields thousands of high-quality explanations for naturally-occurring model behaviors along with supporting counterfactual evidence. We apply CHIVE in two ways. First, we evaluate whether common LLM interpretability techniques improve an agent's ability to predict counterfactual model behaviors. Surprisingly, we find no uplift from any of the interpretability techniques studied. Second, we use CHIVE to generate training data. We find that training models to predict outcomes of CHIVE-generated counterfactual experiments generalizes to various out-of-distribution settings. Overall, CHIVE automatically discovers explanations of naturally-occurring LLM behaviors, enabling us to evaluate and improve methods for explaining LLM behaviors.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-17T15:57:06Z</published>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Adam Karvonen</name>
+    </author>
+    <author>
+      <name>Euan Ong</name>
+    </author>
+    <author>
+      <name>Subhash Kantamneni</name>
+    </author>
+    <author>
+      <name>Samuel Marks</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2608.16539v1</id>
+    <title>Listen, Reason, and Segment: Aligning LALMs with Editorial Judgment for Media Chapterization</title>
+    <updated>2026-08-17T13:14:01Z</updated>
+    <link href="https://arxiv.org/abs/2608.16539v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.16539v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large Audio Language Models (LALMs) have made rapid progress on standardized benchmarks, yet their deployment in practical media workflows, curation, archival indexing, and content distribution remains largely unrealized. We identify automated audio chapterization, the task of segmenting continuous audio streams into thematically coherent chapters, as a demanding and commercially consequential setting that exposes this gap. Chapterization is challenging because boundaries are defined less by objective acoustic events than by subjective editorial judgment, requiring models to reason sequentially over long acoustic contexts and approximate creator-authored boundary decisions. We present AudioChaps, a post-training framework for aligning end-to-end LALMs for this task via Group Relative Policy Optimization (GRPO) guided by Chain-of-Thought (CoT) reasoning. To support training and evaluation, we curate three datasets: AudioChaps-Alignment, derived from creator-annotated chapter boundaries on YouTube; AudioChaps-CoT, which provides structured supervision for well-formatted, high-quality, and evidence-grounded boundary reasoning; and AudioChaps-Eval, a held-out benchmark for audio chapterization. Applying GRPO directly without a Supervised Fine-Tuning (SFT) cold start, AudioChaps-R1-Zero already improves average F1 by 33 points over the state-of-the-art LALM Audio-Flamingo-3-Think. The AudioChaps framework produces our final aligned LALM, AudioChaps-R1, which improves average F1 by 49 points. These results demonstrate that GRPO-trained LALMs can reliably transform unstructured auditory streams into navigable, structured media. Our code, models, and dataset resources will be released upon acceptance at https://github.com/ta012/AudioChaps.</summary>
+    <category term="cs.SD" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="eess.AS" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-17T13:14:01Z</published>
+    <arxiv:comment>19 pages, 9 figures, 8 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.SD"/>
+    <author>
+      <name>Tony Alex</name>
+    </author>
+    <author>
+      <name>Wish Suharitdamrong</name>
+    </author>
+    <author>
+      <name>Sara Atito</name>
+    </author>
+    <author>
+      <name>Armin Mustafa</name>
+    </author>
+    <author>
+      <name>Muhammad Awais</name>
+    </author>
+    <author>
+      <name>Philip J. B. Jackson</name>
+    </author>
+    <author>
+      <name>Jiankang Deng</name>
+    </author>
+    <author>
+      <name>Ismail Elezi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2608.15869v1</id>
+    <title>Beyond Visual CoT: Internalized Visual Thinking for Proactive Video Reasoning</title>
+    <updated>2026-08-16T17:35:38Z</updated>
+    <link href="https://arxiv.org/abs/2608.15869v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.15869v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Multimodal large language models increasingly use visual chain-of-thought (Visual CoT) to reason about spatial, temporal, and embodied environments. By generating intermediate reasoning images, Visual CoT provides an intuitive mechanism for visual foresight but introduces substantial inference overhead, which is particularly problematic for proactive video reasoning. We ask whether models can learn to think visually during training while reasoning directly at inference. We introduce Internalized Visual Thinking (IVT), a post-training framework that jointly optimizes textual prediction and next-embedding prediction over unlabeled videos. Given a partially observed video, IVT predicts latent representations of future frames together with the target textual answer, encouraging the model to capture motion, object transitions, interactions, and latent intent. At inference, IVT generates the answer directly without synthesizing or re-encoding future frames. We conduct controlled studies across target representations, decoder designs, prediction horizons, data mixtures, training curricula, and predictive objectives. IVT improves over direct-answer fine-tuning on all six evaluation settings while retaining the same inference pathway. Compared with explicit Visual CoT, IVT achieves comparable or better performance and reduces average end-to-end latency by more than 5x. Together, our findings suggest that explicit pixel-space generation at inference time, as used in visual chain-of-thought, may not be necessary for effective proactive video reasoning. Predictive world modeling can be internalized during training to produce multimodal reasoners that are both more accurate and substantially more efficient.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.MM" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-08-16T17:35:38Z</published>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Xiaoyu Zhu</name>
+    </author>
+    <author>
+      <name>Xinke Deng</name>
+    </author>
+    <author>
+      <name>Suresh Taddewadikar</name>
+    </author>
+    <author>
+      <name>Arnab Kumar Mondal</name>
+    </author>
+    <author>
+      <name>Zhongyu Jiang</name>
+    </author>
+    <author>
+      <name>Ian Fasel</name>
+    </author>
+    <author>
+      <name>Joerg Liebelt</name>
+    </author>
+  </entry>
+</feed>

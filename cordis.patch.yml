@@ -1,0 +1,4 @@
+# dsh-arxiv-ml-search bundle patch layer — applied to any profile listing this bundle.
+- insert:
+    - id: dsh-arxiv-ml-search
+      name: dsh-arxiv-ml-search

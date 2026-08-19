@@ -1,0 +1,51 @@
+{
+  "name": "dsh-arxiv-ml-search",
+  "version": "0.1.0",
+  "description": "Search arXiv for ML/DL/RL papers and check claims against real abstracts.",
+  "type": "module",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "lib",
+    "skills",
+    "cordis.patch.yml"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "scripts": {
+    "test": "node --test",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "arxiv",
+    "machine-learning",
+    "research",
+    "literature-search"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-skill": "*"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/dsh-skill": {
+      "optional": true
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/babkiny/dsh-arxiv-ml-search.git"
+  },
+  "homepage": "https://github.com/babkiny/dsh-arxiv-ml-search",
+  "dependencies": {
+    "@deepseek-ai/dsh-tools": "^0.1.0-rc.7"
+  }
+}

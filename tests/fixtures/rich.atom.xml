@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <title>arXiv Query: handcrafted edge cases</title>
+  <opensearch:itemsPerPage>2</opensearch:itemsPerPage>
+  <opensearch:totalResults>2</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/cs/0701001v1</id>
+    <title>A Pre-2007 Identifier &amp; A Title
+  Wrapped Across Lines</title>
+    <updated>2007-01-02T10:00:00Z</updated>
+    <link href="http://arxiv.org/abs/cs/0701001v1" rel="alternate" type="text/html"/>
+    <link href="http://arxiv.org/pdf/cs/0701001v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>  This abstract is wrapped by the API across several
+lines, with an entity such as &lt;tag&gt; inside it, and it
+should come back as one clean paragraph.
+</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2007-01-01T09:00:00Z</published>
+    <arxiv:comment>8 pages</arxiv:comment>
+    <arxiv:doi>10.1000/example.doi</arxiv:doi>
+    <arxiv:journal_ref>Journal of Examples 12 (2007) 34-56</arxiv:journal_ref>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Ada Lovelace</name>
+      <arxiv:affiliation>Analytical Engine Lab</arxiv:affiliation>
+    </author>
+    <author>
+      <name>Grace Hopper</name>
+    </author>
+    <author>
+      <name>Alan Turing</name>
+    </author>
+    <author>
+      <name>Claude Shannon</name>
+    </author>
+    <author>
+      <name>Barbara Liskov</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2101.00001v1</id>
+    <title>Sparse Entry Without Optional Fields</title>
+    <updated>2021-01-01T00:00:00Z</updated>
+    <link href="http://arxiv.org/abs/2101.00001v1" rel="alternate" type="text/html"/>
+    <summary>No comment, no doi, no journal ref, and no pdf link on this one.</summary>
+    <category term="stat.ML" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2021-01-01T00:00:00Z</published>
+    <arxiv:primary_category term="stat.ML"/>
+    <author>
+      <name>Solo Author</name>
+    </author>
+  </entry>
+</feed>
